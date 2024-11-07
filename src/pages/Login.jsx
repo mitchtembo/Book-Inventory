@@ -18,8 +18,9 @@ const Login = () => {
     e.preventDefault();
     try {
       await signIn(formData.email, formData.password);
-      navigate("/"); // redirect to homepage after login
+      navigate("/home", { replace: true }); // redirect to homepage after login
     } catch (error) {
+      alert("Error signing in:", error);
       console.log("Error signing in:", error);
     }
   };
@@ -73,7 +74,7 @@ const Login = () => {
                 placeholder="Please Enter your password"
                 className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm
                 "
-                value={FormData.password}
+                value={formData.password}
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }

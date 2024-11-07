@@ -11,18 +11,29 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    //implement superbase auth state listener
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user ?? null);
+    //initialize session
+    const initializeSession = async () => {
+      const { data: sessionData, error } = supabase.auth.getSession();
+      if (error) {
+        alert("Error fetching session data");
+        console.log("Error fetching session data: ", error);
+      }
+      setUser(sessionData.session?.user ?? null);
       setLoading(false);
-    });
+    };
 
-    //check the initial session
-    const session = supabase.auth.getSession();
-    setUser(session?.user ?? null);
-    setLoading(false);
+    initializeSession();
+
+    //auth state change listener
+    const { data: subscription } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    initializeSession();
+
     // Cleanup listener on component unmount
     return () => subscription.unsubscribe();
   }, []);
@@ -41,19 +52,20 @@ export const AuthProvider = ({ children }) => {
 
   const signUp = async (email, password) => {
     setLoading(true);
-    const { user: authUser, error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
     });
     setLoading(false);
     if (error) throw error;
-    setUser(authUser);
+    setUser(data.user);
   };
 
   const signOut = async () => {
     setLoading(true);
     await supabase.auth.signOut();
     setUser(null);
+    setLoading(false);
   };
 
   return (
