@@ -9,7 +9,7 @@ const Home = () => {
       id: 1,
       title: "Harry Potter",
       author: "J.K. Rowling",
-      price: 10,
+      price: 100,
       image:
         "https://images-na.ssl-images-amazon.com/images/I/51UoqRAxwEL._SX331_BO1,204,203,200_.jpg",
     },
