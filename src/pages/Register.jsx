@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import supabase from "../superbaseClient";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -7,23 +9,35 @@ const Register = () => {
   });
   const [error, setError] = useState(null);
 
+  // navigate
+  const navigate = useNavigate();
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+
+    // Clear any previous error message
+    setError(null);
+
+    // Attempt to sign up with Supabase
     const { data, error } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
     });
-    // handle the response
+
+    // Handle the response
     if (error) {
       setError(error.message);
-      console.log(error);
+      console.log("Error:", error);
     } else {
-      console.log(data);
+      console.log("Success:", data);
       alert("Registration successful");
+      setFormData({ email: "", password: "" }); // Reset form
+      navigate("/");
     }
   };
+
   return (
-    <form action="#">
+    <form onSubmit={handleFormSubmit} className="max-w-md mx-auto p-6">
       <div className="mb-4">
         <label
           htmlFor="email"
@@ -49,18 +63,24 @@ const Register = () => {
           Password
         </label>
         <input
-          className="w-full p-2 border border-gray-300 rounded-md"
           type="password"
           id="password"
+          required
+          className="w-full p-2 border border-gray-300 rounded-md"
+          placeholder="Enter your password"
+          value={formData.password}
           onChange={(e) =>
             setFormData({ ...formData, password: e.target.value })
           }
-          placeholder="Enter your password"
-          required
         />
       </div>
-      <div className=" items-center">
-        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md">
+      {error && <p className="text-red-500 mb-4">{error}</p>}{" "}
+      {/* Error message */}
+      <div className="text-center">
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
+        >
           Register
         </button>
       </div>

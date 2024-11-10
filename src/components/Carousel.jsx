@@ -1,22 +1,43 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
-const bookCovers = [
-  "https://m.media-amazon.com/images/I/51TLHTNDDuL._SY445_SX342_.jpg",
-  "https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&q=80&w=800&h=400",
-  "https://m.media-amazon.com/images/I/51O0GdqXdxL._SY445_SX342_.jpg",
-];
+import supabase from "../superbaseClient";
 
 const Carousel = () => {
+  const [bookCovers, setBookCovers] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % bookCovers.length);
-    }, 5000);
-    return () => clearInterval(interval);
+    const fetchImageCovers = async () => {
+      console.log("attempting to fetch image covers");
+      try {
+        let { data, error } = await supabase.from("books").select("coverurl");
+        if (error) {
+          console.error("Error fetching book covers:", error);
+        } else {
+          const covers = data.map((cover) => cover.coverurl);
+          setBookCovers(covers);
+          console.log("Carousel image covers", data);
+        }
+      } catch (error) {
+        console.error("Error fetching book covers:", error);
+      }
+    };
+    fetchImageCovers();
   }, []);
+
+  useEffect(() => {
+    if (bookCovers.length > 0) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % bookCovers.length);
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [bookCovers.length]);
+
+  //console.log(bookCovers);
+
+  // onClick functions
 
   const nextSlide = () =>
     setCurrentIndex((prevIndex) => (prevIndex + 1) % bookCovers.length);
@@ -26,9 +47,9 @@ const Carousel = () => {
       (prevIndex) => (prevIndex - 1 + bookCovers.length) % bookCovers.length
     );
   return (
-    <div className="relative w-full h-[400px] overflow-hidden  rounded-xl">
+    <div className="relative w-full h-[250px] overflow-hidden  rounded-xl mt-10 ">
       <div
-        className="absolute inset-0 flex transition-transform duration-500 ease-in-out"
+        className="absolute inset-0 flex transition-transform duration-500 ease-in-out w-full"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
         {bookCovers.map((cover, index) => (
@@ -36,7 +57,7 @@ const Carousel = () => {
             key={index}
             src={cover}
             alt={`Book Cover: ${index + 1}`}
-            className="w-full h-full object-cover flex-shrink-0"
+            className="w-full h-full object-contain flex-shrink-0"
           />
         ))}
       </div>

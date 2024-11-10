@@ -112,10 +112,7 @@ const Navbar = () => {
                     className="flex items-center space-x-2 mr-4"
                     onClick={signOut}
                   >
-                    <Link
-                      to="/logout"
-                      className="flex items-center space-x-2 mr-4"
-                    >
+                    <Link className="flex items-center space-x-2 mr-4">
                       <LogOut className="h-8 w-8 text-indigo-600" />
                       <span className="text-lg font-bold text-cyan">
                         Logout

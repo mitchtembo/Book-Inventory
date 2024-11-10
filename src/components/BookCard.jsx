@@ -8,7 +8,7 @@ const BookCard = ({ book }) => {
     "
     >
       <img
-        src={book.image}
+        src={book.coverurl}
         alt={book.title}
         className="w-full h-48 object-cover"
       />
